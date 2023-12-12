@@ -19,6 +19,36 @@ public class EmployeeDao {
         jdbcTemplate = new JdbcTemplate();
         jdbcTemplate.setDataSource(dataSource);
     }
+    public double avgSalaryModernWay(){
+        return jdbcTemplate.queryForList("select salary from employee",
+                Double.class)
+                .stream()
+                .mapToDouble(Double::doubleValue)
+                .average().getAsDouble();
+    }
+    public double avgSalary(){
+        return jdbcTemplate.queryForObject(
+                "select avg(salary) from employee",Double.class
+        );
+    }
+
+    public Employee highSalaryEmployee(){
+        return jdbcTemplate.queryForObject("""
+select * from employee order by salary desc limit 1
+""",
+                this::mapEmployee);
+    }
+
+    public void changeFirstName(int id,String firstName){
+        jdbcTemplate.update("update employee set first_name = ? where id = ?",
+                new Object[]{firstName,id});
+
+    }
+
+    public void deleteEmployee(int id){
+        jdbcTemplate.update("delete from employee where id =?",
+                new Object[]{id});
+    }
 
     public void createEmployee(int id, String firstName, String lastName,
                                String email, String phoneNumber,
